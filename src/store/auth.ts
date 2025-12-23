@@ -7,13 +7,10 @@ interface AuthState {
   userInfo: UserInfo | null
 }
 
-const TOKEN_KEY = 'access_token'
-const REFRESH_TOKEN_KEY = 'refresh_token'
-
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
-    token: localStorage.getItem(TOKEN_KEY),
-    refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
+    token: null,
+    refreshToken: null,
     userInfo: null,
   }),
   getters: {
@@ -22,19 +19,8 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     setToken(token: string | null, refreshToken?: string | null) {
       this.token = token
-      if (token) {
-        localStorage.setItem(TOKEN_KEY, token)
-      } else {
-        localStorage.removeItem(TOKEN_KEY)
-      }
-
       if (refreshToken !== undefined) {
         this.refreshToken = refreshToken
-        if (refreshToken) {
-          localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
-        } else {
-          localStorage.removeItem(REFRESH_TOKEN_KEY)
-        }
       }
     },
     setUserInfo(user: UserInfo | null) {
@@ -66,7 +52,16 @@ export const useAuthStore = defineStore('auth', {
       }
       this.setToken(null, null)
       this.setUserInfo(null)
+      // 清除持久化状态
+      this.$clearPersisted()
     },
+  },
+  // 配置持久化
+  persist: {
+    key: 'auth_store',
+    paths: ['token', 'refreshToken', 'userInfo'],
+    encrypted: true,
+    ttl: 7 * 24 * 60 * 60 * 1000, // 7 天
   },
 })
 

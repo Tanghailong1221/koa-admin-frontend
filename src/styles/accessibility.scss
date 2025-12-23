@@ -1,0 +1,101 @@
+/**
+ * 可访问性样式
+ */
+
+// 屏幕阅读器专用(隐藏但可访问)
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+// 焦点可见样式
+.focus-visible {
+    outline: 2px solid var(--el-color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+// 跳过导航链接
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    z-index: 100;
+    padding: 8px 16px;
+    background-color: var(--el-color-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+
+    &:focus {
+        top: 0;
+    }
+}
+
+// 高对比度模式支持
+@media (prefers-contrast: high) {
+    * {
+        border-color: currentColor !important;
+    }
+
+    .el-button {
+        border-width: 2px !important;
+    }
+}
+
+// 减少动画(用户偏好)
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+// 键盘导航焦点样式
+*:focus-visible {
+    outline: 2px solid var(--el-color-primary);
+    outline-offset: 2px;
+}
+
+// 移除鼠标点击的焦点样式
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+// 错误状态
+[aria-invalid='true'] {
+    border-color: var(--el-color-danger) !important;
+}
+
+// 禁用状态
+[aria-disabled='true'] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+// 隐藏状态
+[aria-hidden='true'] {
+    display: none !important;
+}
+
+// 实时区域
+[aria-live] {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
