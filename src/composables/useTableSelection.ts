@@ -153,7 +153,7 @@ export function useTableSelection<T extends Record<string, any>>(
     /**
      * 设置选中的行
      */
-    const setSelection = (rows: T[]): void {
+    const setSelection = (rows: T[]): void => {
         clearSelection()
         selectRows(rows)
     }

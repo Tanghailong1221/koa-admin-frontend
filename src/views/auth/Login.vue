@@ -460,14 +460,32 @@ onUnmounted(() => {
 
 <style scoped>
 .login {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   background: linear-gradient(180deg, #F8FAFC 0%, #E8F3FF 100%);
+  overflow: hidden;
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+.login::-webkit-scrollbar {
+  display: none;
+}
+
+.login {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* 左侧面板 */
 .login__left {
   flex: 0 0 60%;
+  max-width: 60%;
   background: linear-gradient(135deg, #0a0f1e 0%, #1a2332 30%, #0f172a 60%, #0a0f1e 100%);
   position: relative;
   overflow: hidden;
@@ -493,7 +511,10 @@ onUnmounted(() => {
 .login__left::before {
   content: '';
   position: absolute;
-  inset: -8% -12%;
+  top: -8%;
+  left: -12%;
+  right: -12%;
+  bottom: -8%;
   background: linear-gradient(
     135deg,
     #000000 0%,
@@ -780,11 +801,25 @@ onUnmounted(() => {
 
 /* 右侧面板 */
 .login__right {
-  flex: 0 0 40%;
+  flex: 1;
+  max-width: 40%;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* 隐藏右侧面板滚动条 */
+.login__right::-webkit-scrollbar {
+  display: none;
+}
+
+.login__right {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .login__form-wrapper {
@@ -824,6 +859,7 @@ onUnmounted(() => {
   color: #165DFF;
   margin: 0;
   text-align: left;
+  animation: slideUpFadeIn 0.6s ease-out 0.2s both;
 }
 
 .login__title-underline {
@@ -832,11 +868,52 @@ onUnmounted(() => {
   margin: 8px 0 16px 0;
   background: linear-gradient(90deg, #165DFF 0%, #00E5FF 100%);
   border-radius: 999px;
+  animation: slideUpFadeIn 0.6s ease-out 0.3s both;
 }
 
 .login-form {
   margin-top: 16px;
   margin-bottom: 0;
+}
+
+/* 表单项滑入动画 */
+.login-form :deep(.el-form-item) {
+  animation: slideUpFadeIn 0.6s ease-out both;
+}
+
+.login-form :deep(.el-form-item:nth-child(1)) {
+  animation-delay: 0.4s;
+}
+
+.login-form :deep(.el-form-item:nth-child(2)) {
+  animation-delay: 0.5s;
+}
+
+.login-form :deep(.el-form-item:nth-child(3)) {
+  animation-delay: 0.6s;
+}
+
+.login-form :deep(.el-form-item:nth-child(4)) {
+  animation-delay: 0.7s;
+}
+
+.login-form :deep(.el-form-item:nth-child(5)) {
+  animation-delay: 0.8s;
+}
+
+.login-footer {
+  animation: slideUpFadeIn 0.6s ease-out 0.9s both;
+}
+
+@keyframes slideUpFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .login-form :deep(.el-form-item__label) {

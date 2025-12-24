@@ -30,7 +30,7 @@ export default {
     dataPermission: 'Data Permission Example',
     performance: 'Performance Example',
     tableFilter: 'Table Filter Example',
-    dict: 'Dictionary Example',
+    dictExample: 'Dictionary Example',
     dictValidation: 'Dictionary Validation Example',
     imageOptimization: 'Image Optimization Example',
     performanceMonitor: 'Performance Monitor Example'

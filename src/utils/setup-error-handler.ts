@@ -89,6 +89,16 @@ export function setupErrorHandler(app: App) {
             return
         }
 
+        // 忽略 ResizeObserver 错误（这是浏览器的已知问题，不影响功能）
+        if (event.message && event.message.includes('ResizeObserver')) {
+            return
+        }
+
+        // 忽略 null 错误
+        if (!event.error && !event.message) {
+            return
+        }
+
         console.error('[Global Error Handler] JavaScript 错误:', event.error)
 
         // 记录到 ErrorLogger

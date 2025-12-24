@@ -249,15 +249,21 @@ export default defineConfig(({ mode }) => {
 
     // 服务器配置
     server: {
-      port: 3000,
+      port: 5173,
       open: true,
       cors: true,
-      // 代理配置
+      // 代理配置 - 将 /api 请求代理到后端服务
       proxy: {
         '/api': {
-          target: env.VITE_API_BASE_URL || 'http://localhost:3000',
+          target: env.VITE_API_BASE_URL || 'http://localhost:3000/api',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
+          rewrite: (path) => path.replace(/^\/api/, ''),
+          // 配置代理日志
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq, req) => {
+              console.log(`[Proxy] ${req.method} ${req.url} -> ${proxyReq.path}`)
+            })
+          }
         }
       }
     },

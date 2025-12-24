@@ -22,8 +22,7 @@ const buildRoutes = (menus: MenuItem[]): RouteRecordRaw[] => {
         routes.push({
           path: item.path,
           name: item.path,
-          meta: { title: item.title, permissions: item.permissions },
-          redirect: item.redirect,
+          meta: { title: item.name },
           component: component ?? (() => import('@/views/error/NotFound.vue')),
         })
       }

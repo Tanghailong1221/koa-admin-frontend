@@ -1,11 +1,9 @@
-import type { LoginPayload, LoginResponse, UserInfo, RefreshResponse } from '@/api/auth'
-import type { BackendMenu } from '@/api/menu'
-import type { UserListItem, UserListQuery } from '@/api/user'
-import type { RoleItem, RoleListQuery } from '@/api/role'
+import type { MenuItem } from '@/types/menu'
+import type { UserInfo, LoginResult, RefreshTokenResult } from '@/types/user'
 import type { PageResult } from '@/types/api'
 
 // Mock 用户数据
-const mockUsers: UserListItem[] = [
+const mockUsers: any[] = [
   {
     id: '1',
     username: 'admin',
@@ -63,7 +61,7 @@ const mockUsers: UserListItem[] = [
 ]
 
 // Mock 角色数据
-const mockRoles: RoleItem[] = [
+const mockRoles: any[] = [
   {
     id: 1,
     roleName: '超级管理员',
@@ -94,58 +92,218 @@ const mockRoles: RoleItem[] = [
 ]
 
 // Mock 菜单数据
-const mockMenus: BackendMenu[] = [
+const mockMenus: MenuItem[] = [
   {
     id: 1,
-    menuName: '系统管理',
-    menuType: 1,
-    path: '/system',
-    component: '',
-    icon: 'Setting',
-    sort: 1,
-    visible: 1,
-    status: 1,
-    permCode: 'system',
-    children: [
-      {
-        id: 11,
-        menuName: '用户管理',
-        menuType: 2,
-        parentId: 1,
-        path: '/system/user',
-        component: 'system/user/List',
-        icon: 'User',
-        sort: 1,
-        visible: 1,
-        status: 1,
-        permCode: 'user:list',
-      },
-      {
-        id: 12,
-        menuName: '角色管理',
-        menuType: 2,
-        parentId: 1,
-        path: '/system/role',
-        component: 'system/role/List',
-        icon: 'UserFilled',
-        sort: 2,
-        visible: 1,
-        status: 1,
-        permCode: 'role:list',
-      },
-    ],
-  },
-  {
-    id: 2,
-    menuName: '仪表盘',
-    menuType: 2,
+    name: '仪表盘',
     path: '/',
     component: 'dashboard/Index',
     icon: 'Odometer',
     sort: 0,
     visible: 1,
     status: 1,
-    permCode: 'dashboard',
+  },
+  {
+    id: 2,
+    name: '系统管理',
+    path: '/system',
+    component: '',
+    icon: 'Setting',
+    sort: 1,
+    visible: 1,
+    status: 1,
+    parentId: 0,
+    children: [
+      {
+        id: 21,
+        name: '用户管理',
+        parentId: 2,
+        path: '/system/user',
+        component: 'system/user/List',
+        icon: 'User',
+        sort: 1,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 22,
+        name: '角色管理',
+        parentId: 2,
+        path: '/system/role',
+        component: 'system/role/List',
+        icon: 'UserFilled',
+        sort: 2,
+        visible: 1,
+        status: 1,
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: '示例页面',
+    path: '/examples',
+    component: '',
+    icon: 'Grid',
+    sort: 2,
+    visible: 1,
+    status: 1,
+    parentId: 0,
+    children: [
+      {
+        id: 31,
+        name: 'ProTable 示例',
+        parentId: 3,
+        path: '/examples/pro-table',
+        component: 'examples/ProTableExample',
+        icon: 'Grid',
+        sort: 1,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 32,
+        name: 'ProForm 示例',
+        parentId: 3,
+        path: '/examples/pro-form',
+        component: 'examples/ProFormExample',
+        icon: 'Edit',
+        sort: 2,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 33,
+        name: '表单草稿',
+        parentId: 3,
+        path: '/examples/form-draft',
+        component: 'examples/FormDraftExample',
+        icon: 'Document',
+        sort: 3,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 34,
+        name: '表单验证',
+        parentId: 3,
+        path: '/examples/form-validation',
+        component: 'examples/FormValidationExample',
+        icon: 'CircleCheck',
+        sort: 4,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 35,
+        name: '主题切换',
+        parentId: 3,
+        path: '/examples/theme',
+        component: 'examples/ThemeExample',
+        icon: 'Sunny',
+        sort: 5,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 36,
+        name: '高级表格',
+        parentId: 3,
+        path: '/examples/advanced-table',
+        component: 'examples/AdvancedTableExample',
+        icon: 'Grid',
+        sort: 6,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 37,
+        name: '权限示例',
+        parentId: 3,
+        path: '/examples/permission',
+        component: 'examples/PermissionExample',
+        icon: 'Lock',
+        sort: 7,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 38,
+        name: '数据权限',
+        parentId: 3,
+        path: '/examples/data-permission',
+        component: 'examples/DataPermissionExample',
+        icon: 'Key',
+        sort: 8,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 39,
+        name: '性能优化',
+        parentId: 3,
+        path: '/examples/performance',
+        component: 'examples/PerformanceExample',
+        icon: 'TrendCharts',
+        sort: 9,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 310,
+        name: '表格过滤',
+        parentId: 3,
+        path: '/examples/table-filter',
+        component: 'examples/TableFilterExample',
+        icon: 'Filter',
+        sort: 10,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 311,
+        name: '字典示例',
+        parentId: 3,
+        path: '/examples/dict',
+        component: 'examples/DictExample',
+        icon: 'Collection',
+        sort: 11,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 312,
+        name: '字典验证',
+        parentId: 3,
+        path: '/examples/dict-validation',
+        component: 'examples/DictValidationExample',
+        icon: 'CircleCheck',
+        sort: 12,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 313,
+        name: '图片优化',
+        parentId: 3,
+        path: '/examples/image-optimization',
+        component: 'examples/ImageOptimizationExample',
+        icon: 'Picture',
+        sort: 13,
+        visible: 1,
+        status: 1,
+      },
+      {
+        id: 314,
+        name: '性能监控',
+        parentId: 3,
+        path: '/examples/performance-monitor',
+        component: 'examples/PerformanceMonitorExample',
+        icon: 'Monitor',
+        sort: 14,
+        visible: 1,
+        status: 1,
+      },
+    ],
   },
 ]
 
@@ -155,11 +313,11 @@ const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
 // Mock API 处理函数
 export const mockApi = {
   // 登录
-  async login(data: LoginPayload): Promise<LoginResponse> {
+  async login(data: any): Promise<LoginResult> {
     await delay()
     if (data.username === 'admin' && data.password === 'admin123') {
       const userInfo: UserInfo = {
-        id: '1',
+        id: 1,
         username: 'admin',
         nickname: '管理员',
         roleId: 1,
@@ -182,7 +340,7 @@ export const mockApi = {
   },
 
   // 刷新 token
-  async refreshToken(refreshToken: string): Promise<RefreshResponse> {
+  async refreshToken(refreshToken: string): Promise<RefreshTokenResult> {
     await delay()
     return {
       token: 'mock_access_token_' + Date.now(),
@@ -200,7 +358,7 @@ export const mockApi = {
   async getCurrentUser(): Promise<UserInfo> {
     await delay()
     return {
-      id: '1',
+      id: 1,
       username: 'admin',
       nickname: '管理员',
       roleId: 1,
@@ -216,13 +374,13 @@ export const mockApi = {
   },
 
   // 获取菜单树
-  async getMenuTree(): Promise<BackendMenu[]> {
+  async getMenuTree(): Promise<MenuItem[]> {
     await delay()
     return mockMenus
   },
 
   // 获取用户列表
-  async getUserList(params: UserListQuery): Promise<PageResult<UserListItem>> {
+  async getUserList(params: any): Promise<PageResult<any>> {
     await delay()
     let list = [...mockUsers]
 
@@ -255,7 +413,7 @@ export const mockApi = {
   },
 
   // 获取角色列表
-  async getRoleList(params: RoleListQuery): Promise<PageResult<RoleItem>> {
+  async getRoleList(params: any): Promise<PageResult<any>> {
     await delay()
     let list = [...mockRoles]
 

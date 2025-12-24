@@ -29,6 +29,7 @@ const themeStore = useThemeStore()
 
 const active = computed(() => route.path)
 const keepAliveNames = computed(() => tabsStore.keepAliveNames)
+const isDark = computed(() => themeStore.mode === 'dark')
 
 // 菜单图标映射
 const menuIconMap: Record<string, any> = {
@@ -39,68 +40,20 @@ const menuIconMap: Record<string, any> = {
   User,
   Lock,
   Setting,
+  Grid: DataBoard,
+  Edit: Document,
+  CircleCheck: Lock,
+  Sunny,
+  Filter: Document,
+  Collection: DataBoard,
+  Picture: Document,
+  Monitor: TrendCharts,
+  Key: Lock,
+  UserFilled: User,
 }
 
-// 静态菜单项（用于演示，实际应该从 menuStore.menus 获取）
-const staticMenuItems = [
-  { path: '/', title: '仪表盘', icon: 'Odometer' },
-  { path: '/data-analysis', title: '数据分析', icon: 'TrendCharts' },
-  {
-    path: '/data-management',
-    title: '数据管理',
-    icon: 'DataBoard',
-    children: [
-      { path: '/data-management/list', title: '数据列表', icon: 'Document' },
-      { path: '/data-management/detail', title: '数据详情', icon: 'Document' },
-    ],
-  },
-  { path: '/report-center', title: '报表中心', icon: 'Document' },
-  { path: '/system/user', title: '用户管理', icon: 'User' },
-  {
-    path: '/system',
-    title: '系统设置',
-    icon: 'Setting',
-    children: [
-      { path: '/system/base', title: '基础设置', icon: 'Setting' },
-      { path: '/system/security', title: '安全策略', icon: 'Lock' },
-    ],
-  },
-  { path: '/security', title: '安全中心', icon: 'Lock' },
-  // 模拟更多菜单，触发滚动
-  { path: '/ops/monitor', title: '监控中心', icon: 'TrendCharts' },
-  { path: '/ops/logs', title: '日志审计', icon: 'Document' },
-  { path: '/ops/alerts', title: '告警管理', icon: 'Bell' },
-  { path: '/finance/summary', title: '财务概览', icon: 'DataBoard' },
-  {
-    path: '/finance',
-    title: '财务管理',
-    icon: 'Document',
-    children: [
-      { path: '/finance/invoice', title: '发票管理', icon: 'Document' },
-      { path: '/finance/payable', title: '应付账款', icon: 'Document' },
-      { path: '/finance/receivable', title: '应收账款', icon: 'Document' },
-    ],
-  },
-  { path: '/hr/staff', title: '员工档案', icon: 'User' },
-  { path: '/hr/attendance', title: '考勤管理', icon: 'User' },
-  { path: '/project/list', title: '项目管理', icon: 'DataBoard' },
-  { path: '/project/kanban', title: '看板视图', icon: 'DataBoard' },
-  {
-    path: '/dev',
-    title: '研发管理',
-    icon: 'Setting',
-    children: [
-      { path: '/dev/req', title: '需求管理', icon: 'Document' },
-      { path: '/dev/bug', title: '缺陷管理', icon: 'Document' },
-      { path: '/dev/release', title: '发布计划', icon: 'Setting' },
-    ],
-  },
-  { path: '/asset/list', title: '资产管理', icon: 'Document' },
-  { path: '/asset/stock', title: '库存管理', icon: 'DataBoard' },
-  { path: '/partner', title: '合作伙伴', icon: 'User' },
-  { path: '/support/ticket', title: '工单中心', icon: 'Document' },
-  { path: '/support/faq', title: '知识库', icon: 'Document' },
-]
+// 使用动态菜单
+const menuItems = computed(() => menuStore.menus || [])
 
 const handleSelect = (index: string) => {
   router.push(index)
@@ -111,11 +64,10 @@ const getMenuIcon = (iconName?: string) => {
   if (!iconName) return null
   return menuIconMap[iconName]
 }
-
 </script>
 
 <template>
-  <div class="layout">
+  <div class="layout" :class="{ 'is-dark': isDark }">
     <aside class="layout__sider">
       <!-- Logo 区 -->
       <div class="layout__logo">
@@ -136,13 +88,13 @@ const getMenuIcon = (iconName?: string) => {
         :unique-opened="true"
         @select="handleSelect"
       >
-        <template v-for="item in staticMenuItems" :key="item.path">
+        <template v-for="item in menuItems" :key="item.path">
           <el-sub-menu v-if="item.children?.length" :index="item.path">
             <template #title>
               <el-icon v-if="getMenuIcon(item.icon)">
                 <component :is="getMenuIcon(item.icon)" />
               </el-icon>
-              <span>{{ item.title }}</span>
+              <span>{{ item.name }}</span>
             </template>
             <el-menu-item
               v-for="child in item.children"
@@ -152,14 +104,14 @@ const getMenuIcon = (iconName?: string) => {
               <el-icon v-if="getMenuIcon(child.icon)">
                 <component :is="getMenuIcon(child.icon)" />
               </el-icon>
-              <span>{{ child.title }}</span>
+              <span>{{ child.name }}</span>
             </el-menu-item>
           </el-sub-menu>
           <el-menu-item v-else :index="item.path">
             <el-icon v-if="getMenuIcon(item.icon)">
               <component :is="getMenuIcon(item.icon)" />
             </el-icon>
-            <span>{{ item.title }}</span>
+            <span>{{ item.name }}</span>
           </el-menu-item>
         </template>
       </el-menu>
@@ -169,7 +121,6 @@ const getMenuIcon = (iconName?: string) => {
         <div class="version-card">
           <div class="version-card__label">系统版本</div>
           <div class="version-card__value">v2.5.0 Pro</div>
-          <div class="version-card__glow"></div>
         </div>
       </div>
     </aside>
@@ -187,9 +138,9 @@ const getMenuIcon = (iconName?: string) => {
               </el-button>
             </el-badge>
 
-            <el-button class="header-actions__btn" text @click="themeStore.toggle()">
+            <el-button class="header-actions__btn" text @click="themeStore.toggle($event)">
               <el-icon :size="18">
-                <component :is="themeStore.mode === 'dark' ? Sunny : Moon" />
+                <component :is="isDark ? Sunny : Moon" />
               </el-icon>
             </el-button>
           </div>
@@ -212,48 +163,14 @@ const getMenuIcon = (iconName?: string) => {
 
 <style scoped>
 .layout {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   background: var(--bg-primary);
   position: relative;
   overflow: hidden;
 }
 
-.layout::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(22, 93, 255, 0.15) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: float 20s ease-in-out infinite;
-}
-
-.layout::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: -10%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(0, 229, 255, 0.1) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: float 15s ease-in-out infinite reverse;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(30px, -30px) scale(1.1);
-  }
-}
-
+/* ========== 亮色模式（默认） ========== */
 .layout__sider {
   width: 240px;
   min-width: 240px;
@@ -263,8 +180,12 @@ const getMenuIcon = (iconName?: string) => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  position: relative;
-  z-index: 1;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  overflow: hidden;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .layout__logo {
@@ -274,6 +195,8 @@ const getMenuIcon = (iconName?: string) => {
   padding: 0 20px;
   gap: 12px;
   border-bottom: 1px solid #e5e6eb;
+  background: #fff;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .logo-icon {
@@ -281,23 +204,19 @@ const getMenuIcon = (iconName?: string) => {
   flex-shrink: 0;
 }
 
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .logo-text__main {
   font-weight: 700;
   font-size: 16px;
   color: #1f2d3d;
   line-height: 1.2;
+  transition: color 0.3s;
 }
 
 .logo-text__sub {
   font-size: 12px;
   color: #86909c;
   line-height: 1.2;
+  transition: color 0.3s;
 }
 
 .layout__menu {
@@ -306,273 +225,196 @@ const getMenuIcon = (iconName?: string) => {
   background: #F8FAFC;
   padding: 12px 8px;
   overflow-y: auto;
-  /* 避免出现/消失滚动条时宽度抖动 */
-  scrollbar-gutter: stable both-edges;
-  /* Chrome/Safari 支持 overlay 时不占用布局宽度 */
-  overflow-y: overlay;
-  min-height: 0; /* 允许在 flex 下正确滚动 */
+  min-height: 0;
   width: 100%;
   box-sizing: border-box;
+  transition: background 0.3s;
 }
 
 .layout__menu :deep(.el-menu) {
   background: transparent;
   border: none;
-  width: 100%;
 }
 
 .layout__menu :deep(.el-menu-item) {
   color: #4e5969;
-  position: relative;
   border-radius: 8px;
   margin: 4px 0;
-  padding: 0 12px;
   height: 40px;
   line-height: 40px;
-  transition: all 0.3s ease, transform 0.25s ease;
-  overflow: hidden;
-  z-index: 0;
+  transition: all 0.3s;
 }
 
-.layout__menu :deep(.el-menu-item:not(.is-active):hover) {
+.layout__menu :deep(.el-menu-item:hover) {
   background: #eef4fb;
-  color: #4e5969;
-  transform: translateX(4px);
-}
-
-.layout__menu :deep(.el-sub-menu__title) {
-  color: #4e5969;
-  position: relative;
-  border-radius: 8px;
-  margin: 4px 0;
-  padding: 0 12px;
-  height: 40px;
-  line-height: 40px;
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.layout__menu :deep(.el-sub-menu__title:hover) {
-  background: #eef4fb;
-  color: #4e5969;
 }
 
 .layout__menu :deep(.el-menu-item.is-active) {
   color: #165DFF;
-  font-weight: 600;
-  box-shadow: none;
-}
-
-.layout__menu :deep(.el-menu-item > *) {
-  position: relative;
-  z-index: 2;
-}
-
-.layout__menu :deep(.el-menu-item .el-icon) {
-  margin-right: 8px;
-  font-size: 18px;
-  color: inherit;
-}
-
-.layout__menu :deep(.el-sub-menu__title .el-icon) {
-  margin-right: 8px;
-  font-size: 18px;
-  color: inherit;
-}
-
-.layout__menu :deep(.el-menu-item:not(.is-active):hover .el-icon),
-.layout__menu :deep(.el-menu-item:not(.is-active):hover .el-icon svg) {
-  color: #165DFF;
-  fill: currentColor;
-}
-
-.layout__menu :deep(.el-sub-menu__title:not(.is-active):hover .el-icon),
-.layout__menu :deep(.el-sub-menu__title:not(.is-active):hover .el-icon svg) {
-  color: #165DFF;
-  fill: currentColor;
-}
-
-.layout__menu :deep(.el-menu-item::after) {
-  content: '';
-  position: absolute;
-  inset: 0;
   background: linear-gradient(90deg, #e8f3ff 0%, #f7fbff 100%);
-  border: 1px solid #cde3ff;
-  border-radius: 10px;
-  opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-  z-index: 0;
+  font-weight: 600;
 }
 
-.layout__menu :deep(.el-menu-item.is-active::after) {
-  opacity: 1;
-  transform: translateX(0);
+.layout__menu :deep(.el-sub-menu__title) {
+  color: #4e5969;
+  border-radius: 8px;
+  margin: 4px 0;
+  height: 40px;
+  line-height: 40px;
+  transition: all 0.3s;
 }
 
-.layout__menu :deep(.el-menu-item::before) {
-  content: '';
-  position: absolute;
-  left: 6px;
-  top: 20%;
-  width: 4px;
-  height: 60%;
-  background: linear-gradient(180deg, #5aa8ff 0%, #165DFF 100%);
-  border-radius: 4px;
-  opacity: 0;
-  transform: scaleY(0.6);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-  z-index: 1;
+.layout__menu :deep(.el-sub-menu__title:hover) {
+  background: #eef4fb;
 }
 
-.layout__menu :deep(.el-menu-item.is-active::before) {
-  opacity: 1;
-  transform: scaleY(1);
+.layout__menu :deep(.el-sub-menu .el-menu) {
+  background: transparent;
 }
 
-.layout__menu :deep(.el-menu-item .el-sub-menu__icon-arrow) {
-  z-index: 2;
-}
-
-.layout__menu :deep(.el-menu-item.is-active),
-.layout__menu :deep(.el-menu-item.is-active .el-icon),
-.layout__menu :deep(.el-menu-item.is-active .el-icon svg),
-.layout__menu :deep(.el-menu-item.is-active span) {
-  color: #165DFF !important;
-  fill: currentColor;
-}
-
-/* 暗色模式适配 */
-:global(html.dark) .layout__sider {
-  background: #0f172a !important;
-  border-right: 1px solid #1f2a40 !important;
-}
-
-:global(html.dark) .layout__logo {
-  border-bottom: 1px solid #1f2a40 !important;
-}
-
-:global(html.dark) .layout__menu {
-  background: #0c1324 !important;
-}
-
-:global(html.dark) .layout__menu :deep(.el-menu-item) {
-  color: #cfd6e4 !important;
-}
-
-:global(html.dark) .layout__menu :deep(.el-menu-item:not(.is-active):hover) {
-  background: #1a2540 !important;
-  color: #cfd6e4 !important;
-}
-
-:global(html.dark) .layout__menu :deep(.el-menu-item .el-icon) {
-  color: inherit;
-}
-
-:global(html.dark) .layout__menu :deep(.el-menu-item::after) {
-  background: linear-gradient(90deg, rgba(22, 93, 255, 0.16) 0%, rgba(22, 93, 255, 0.08) 100%);
-  border: 1px solid rgba(22, 93, 255, 0.35);
-}
-
-:global(html.dark) .layout__menu :deep(.el-menu-item::before) {
-  background: linear-gradient(180deg, #5aa8ff 0%, #165DFF 100%);
-}
-
-:global(html.dark) .layout__menu :deep(.el-menu-item.is-active),
-:global(html.dark) .layout__menu :deep(.el-menu-item.is-active .el-icon),
-:global(html.dark) .layout__menu :deep(.el-menu-item.is-active .el-icon svg),
-:global(html.dark) .layout__menu :deep(.el-menu-item.is-active span) {
-  color: #5aa8ff !important;
-  fill: currentColor;
-}
-
-:global(html.dark) .layout__version {
-  border-top: 1px solid #1f2a40 !important;
-}
-
-:global(html.dark) .version-card {
-  background: rgba(22, 93, 255, 0.12) !important;
-  color: #cfd6e4 !important;
+.layout__menu :deep(.el-sub-menu .el-menu-item) {
+  padding-left: 48px !important;
 }
 
 .layout__version {
   padding: 16px 12px;
   border-top: 1px solid #e5e6eb;
+  background: #fff;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .version-card {
-  position: relative;
-  background: radial-gradient(circle at 80% 30%, rgba(0, 229, 255, 0.32), transparent 55%),
-    linear-gradient(135deg, #f4f5ff 0%, #f6f7ff 40%, #f0f4ff 100%);
-  border-radius: 18px;
-  padding: 14px 18px;
-  font-size: 12px;
-  color: #4e5969;
-  font-weight: 500;
-  border: 1px solid rgba(152, 173, 255, 0.5);
-  box-shadow: 0 8px 24px rgba(22, 93, 255, 0.08);
-  overflow: hidden;
+  background: linear-gradient(135deg, #f4f5ff 0%, #f0f4ff 100%);
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid rgba(152, 173, 255, 0.3);
+  transition: all 0.3s;
 }
 
 .version-card__label {
-  font-size: 13px;
+  font-size: 12px;
   color: #909399;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+  transition: color 0.3s;
 }
 
 .version-card__value {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #165DFF;
+  transition: color 0.3s;
 }
 
-.version-card__glow {
-  position: absolute;
-  right: -20px;
-  bottom: -10px;
-  width: 96px;
-  height: 96px;
-  background: radial-gradient(circle, rgba(0, 229, 255, 0.55) 0%, transparent 60%);
-  opacity: 0.85;
-  pointer-events: none;
+/* ========== 暗色模式 ========== */
+.layout.is-dark .layout__sider {
+  background: #0f172a;
+  border-right-color: #1e293b;
 }
 
+.layout.is-dark .layout__logo {
+  background: #0f172a;
+  border-bottom-color: #1e293b;
+}
+
+.layout.is-dark .logo-text__main {
+  color: #f1f5f9;
+}
+
+.layout.is-dark .logo-text__sub {
+  color: #94a3b8;
+}
+
+.layout.is-dark .layout__menu {
+  background: #0c1324;
+}
+
+.layout.is-dark .layout__menu :deep(.el-menu-item) {
+  color: #cbd5e1;
+}
+
+.layout.is-dark .layout__menu :deep(.el-menu-item:hover) {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+.layout.is-dark .layout__menu :deep(.el-menu-item.is-active) {
+  color: #60a5fa;
+  background: linear-gradient(90deg, rgba(22, 93, 255, 0.15) 0%, rgba(22, 93, 255, 0.05) 100%);
+}
+
+.layout.is-dark .layout__menu :deep(.el-sub-menu__title) {
+  color: #cbd5e1;
+}
+
+.layout.is-dark .layout__menu :deep(.el-sub-menu__title:hover) {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+.layout.is-dark .layout__menu :deep(.el-sub-menu .el-menu-item) {
+  color: #cbd5e1;
+}
+
+.layout.is-dark .layout__menu :deep(.el-sub-menu .el-menu-item:hover) {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+.layout.is-dark .layout__version {
+  background: #0f172a;
+  border-top-color: #1e293b;
+}
+
+.layout.is-dark .version-card {
+  background: linear-gradient(135deg, rgba(22, 93, 255, 0.1) 0%, rgba(22, 93, 255, 0.05) 100%);
+  border-color: rgba(22, 93, 255, 0.2);
+}
+
+.layout.is-dark .version-card__label {
+  color: #94a3b8;
+}
+
+.layout.is-dark .version-card__value {
+  color: #60a5fa;
+}
+
+.layout.is-dark .header-actions__btn {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.layout.is-dark .header-actions__btn:hover {
+  background: rgba(22, 93, 255, 0.2);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+/* ========== 内容区域 ========== */
 .layout__content {
   flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 1;
+  margin-left: 240px;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .layout__header {
   height: 64px;
+  min-height: 64px;
   display: flex;
   align-items: center;
   padding: 0 24px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
   color: var(--text-primary);
   font-weight: 600;
   justify-content: space-between;
-  box-shadow: var(--shadow-md);
-  position: relative;
-}
-
-.layout__header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--gradient-primary);
-  opacity: 0.3;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
 }
 
 .layout__header-left {
@@ -594,58 +436,41 @@ const getMenuIcon = (iconName?: string) => {
 }
 
 .header-actions__btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(22, 93, 255, 0.15);
-  color: #1f2d3d;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   padding: 0;
-  box-shadow: 0 4px 12px rgba(22, 93, 255, 0.1);
   transition: all 0.25s ease;
 }
 
 .header-actions__btn:hover {
   background: rgba(22, 93, 255, 0.1);
-  border-color: rgba(22, 93, 255, 0.35);
+  border-color: #165DFF;
   color: #165DFF;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(22, 93, 255, 0.18);
-}
-
-.header-actions__btn:active {
-  transform: translateY(0);
-}
-
-.header-actions__badge :deep(.el-badge__content) {
-  box-shadow: 0 2px 8px rgba(255, 87, 34, 0.35);
 }
 
 .layout__title {
   font-size: 18px;
   font-weight: 700;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
 }
 
 .layout__tabs {
   padding: 0 16px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
 }
 
 .layout__main {
   flex: 1;
-  padding: 24px;
+  padding: 6px;
   background: transparent;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
 </style>
-

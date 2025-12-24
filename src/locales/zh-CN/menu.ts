@@ -30,7 +30,7 @@ export default {
     dataPermission: '数据权限示例',
     performance: '性能优化示例',
     tableFilter: '表格过滤示例',
-    dict: '字典示例',
+    dictExample: '字典示例',
     dictValidation: '字典验证示例',
     imageOptimization: '图片优化示例',
     performanceMonitor: '性能监控示例'

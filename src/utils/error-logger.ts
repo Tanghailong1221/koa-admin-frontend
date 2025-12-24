@@ -123,6 +123,11 @@ export class ErrorLogger {
             return this.createEmptyEntry()
         }
 
+        // 忽略 ResizeObserver 错误
+        if (message && message.includes('ResizeObserver')) {
+            return this.createEmptyEntry()
+        }
+
         const entry: ErrorLogEntry = {
             id: this.generateId(),
             level,

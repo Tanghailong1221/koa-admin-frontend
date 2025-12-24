@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { getProfileApi, loginApi, logoutApi, refreshTokenApi, type UserInfo } from '@/api/auth'
+import { useMenuStore } from './menu'
 
 interface AuthState {
   token: string | null
@@ -52,6 +53,11 @@ export const useAuthStore = defineStore('auth', {
       }
       this.setToken(null, null)
       this.setUserInfo(null)
+
+      // 清除菜单缓存
+      const menuStore = useMenuStore()
+      menuStore.reset()
+
       // 清除持久化状态
       this.$clearPersisted()
     },
