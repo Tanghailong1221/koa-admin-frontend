@@ -7,6 +7,7 @@ export const useThemeStore = defineStore('theme', {
     const saved = localStorage.getItem('theme') as ThemeMode | null
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     const theme: ThemeMode = saved || (prefersDark ? 'dark' : 'light')
+    const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true'
 
     // 应用主题
     if (theme === 'dark') {
@@ -20,6 +21,7 @@ export const useThemeStore = defineStore('theme', {
     return {
       mode: theme,
       isTransitioning: false,
+      sidebarCollapsed,
     }
   },
   actions: {
@@ -96,6 +98,16 @@ export const useThemeStore = defineStore('theme', {
         document.documentElement.classList.remove('dark')
       }
       localStorage.setItem('theme', this.mode)
+    },
+
+    toggleSidebar() {
+      this.sidebarCollapsed = !this.sidebarCollapsed
+      localStorage.setItem('sidebarCollapsed', String(this.sidebarCollapsed))
+    },
+
+    setSidebarCollapsed(collapsed: boolean) {
+      this.sidebarCollapsed = collapsed
+      localStorage.setItem('sidebarCollapsed', String(collapsed))
     },
   },
 })

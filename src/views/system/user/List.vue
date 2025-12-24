@@ -1,118 +1,260 @@
+<template>
+  <div class="user-list">
+    <!-- 搜索表单 -->
+    <ProSearch
+      ref="searchRef"
+      :options="searchOptions"
+      @search="handleSearch"
+      @reset="handleSearchReset"
+    />
+
+    <!-- 数据表格 -->
+    <ProTablePlus
+      ref="tableRef"
+      :options="tableOptions"
+      @selection-change="handleSelectionChange"
+      @refresh="handleRefresh"
+    >
+      <!-- 工具栏左侧 -->
+      <template #toolbar-left="{ selection }">
+        <el-button v-perm="['user:create']" type="primary" :icon="Plus" @click="handleAdd">
+          新增用户
+        </el-button>
+        <el-button
+          v-perm="['user:delete']"
+          type="danger"
+          :icon="Delete"
+          :disabled="!selection.length"
+          @click="handleBatchDelete(selection)"
+        >
+          批量删除 {{ selection.length ? `(${selection.length})` : '' }}
+        </el-button>
+      </template>
+
+      <!-- 状态列 -->
+      <template #status="{ row }">
+        <el-tag :type="row.status === 1 ? 'success' : 'danger'">
+          {{ row.status === 1 ? '启用' : '禁用' }}
+        </el-tag>
+      </template>
+
+      <!-- 操作列 -->
+      <template #action="{ row }">
+        <el-button v-perm="['user:detail']" type="primary" link size="small" @click="handleView(row)">
+          详情
+        </el-button>
+        <el-button v-perm="['user:update']" type="primary" link size="small" @click="handleEdit(row)">
+          编辑
+        </el-button>
+        <el-popconfirm
+          v-if="row.username !== 'admin'"
+          :title="`确定要删除用户 '${row.username}' 吗？`"
+          @confirm="handleDelete(row)"
+        >
+          <template #reference>
+            <el-button v-perm="['user:delete']" type="danger" link size="small">删除</el-button>
+          </template>
+        </el-popconfirm>
+      </template>
+    </ProTablePlus>
+  </div>
+</template>
+
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { fetchUserList, type UserListItem } from '@/api/user'
+import { ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, Delete } from '@element-plus/icons-vue'
+import {
+  ProTablePlus,
+  ProSearch,
+  defineProTableOptions,
+  defineSearchOptions,
+} from '@/components/pro'
+import type { ProTablePlusInstance, ProSearchInstance } from '@/components/pro'
+import { getUserList } from '@/api/user'
+import type { UserInfo } from '@/types'
 
-const loading = ref(false)
-const tableData = ref<UserListItem[]>([])
+// Refs
+const tableRef = ref<ProTablePlusInstance<UserInfo>>()
+const searchRef = ref<ProSearchInstance>()
 
-const query = reactive({
-  username: '',
-  pageNum: 1,
-  pageSize: 10,
-  total: 0,
+// 搜索参数
+const searchParams = ref<Record<string, any>>({})
+
+/**
+ * 搜索表单配置
+ */
+const searchOptions = defineSearchOptions({
+  fields: [
+    {
+      field: 'keyword',
+      label: '关键字',
+      type: 'input',
+      placeholder: '用户名/昵称/手机号',
+    },
+    {
+      field: 'status',
+      label: '状态',
+      type: 'select',
+      placeholder: '请选择状态',
+      options: [
+        { label: '启用', value: 1 },
+        { label: '禁用', value: 0 },
+      ],
+    },
+  ],
+  showSearch: true,
+  showReset: true,
+  showExpand: false,
+  labelWidth: '80px',
+  columns: 4,
 })
 
-const loadData = async () => {
-  loading.value = true
-  try {
-    const res = await fetchUserList({
-      username: query.username || undefined,
-      pageNum: query.pageNum,
-      pageSize: query.pageSize,
+/**
+ * 表格配置
+ */
+const tableOptions = defineProTableOptions<UserInfo>({
+  card: {
+    show: true,
+    title: '用户管理',
+    description: '管理系统用户账号',
+  },
+  toolbar: {
+    show: true,
+    showRefresh: true,
+    showColumnSetting: true,
+    showExportAll: true,
+    showExportPage: true,
+  },
+  columns: [
+    { prop: 'id', label: 'ID', width: 80, sortable: true },
+    { prop: 'username', label: '用户名', minWidth: 120, sortable: true },
+    { prop: 'nickname', label: '昵称', minWidth: 120 },
+    { prop: 'roleName', label: '角色', width: 120 },
+    { prop: 'orgName', label: '组织', width: 150 },
+    { prop: 'phone', label: '手机号', width: 130 },
+    { prop: 'email', label: '邮箱', minWidth: 180 },
+    { prop: 'status', label: '状态', width: 100, slotName: 'status', sortable: true },
+    { prop: 'createdAt', label: '创建时间', width: 180, sortable: true },
+  ],
+  actionColumn: {
+    show: true,
+    label: '操作',
+    width: 180,
+    fixed: 'right',
+  },
+  selection: true,
+  pagination: {
+    show: true,
+    pageSize: 10,
+    pageSizes: [10, 20, 50, 100],
+    layout: 'total, sizes, prev, pager, next, jumper',
+    background: true,
+  },
+  export: {
+    filename: 'users-export',
+    formats: ['csv', 'json'],
+  },
+  request: async (params) => {
+    const { keyword, status } = searchParams.value
+    const res = await getUserList({
+      page: params.page,
+      size: params.pageSize,
+      keyword,
+      status,
     })
-    query.total = res.total
-    tableData.value = res.list
-  } catch (error: any) {
-    ElMessage.error(error?.message || '加载失败')
-  } finally {
-    loading.value = false
+    return {
+      data: res.list || [],
+      total: res.total || 0,
+      page: params.page,
+      pageSize: params.pageSize,
+    }
+  },
+})
+
+/**
+ * 搜索事件处理
+ */
+const handleSearch = (values: Record<string, any>) => {
+  searchParams.value = values
+  tableRef.value?.reset()
+}
+
+const handleSearchReset = () => {
+  searchParams.value = {}
+}
+
+/**
+ * 表格事件处理
+ */
+const handleSelectionChange = (selection: UserInfo[]) => {
+  console.log('选中的用户:', selection)
+}
+
+const handleRefresh = () => {
+  ElMessage.success('刷新成功')
+}
+
+const handleAdd = () => {
+  ElMessage.info('新增用户功能开发中...')
+}
+
+const handleEdit = (row: UserInfo) => {
+  ElMessage.info(`编辑用户: ${row.username}`)
+}
+
+const handleView = (row: UserInfo) => {
+  ElMessageBox.alert(
+    `
+    <div style="line-height: 2;">
+      <p><strong>ID:</strong> ${row.id}</p>
+      <p><strong>用户名:</strong> ${row.username}</p>
+      <p><strong>昵称:</strong> ${row.nickname || '-'}</p>
+      <p><strong>角色:</strong> ${row.roleName || '-'}</p>
+      <p><strong>组织:</strong> ${row.orgName || '-'}</p>
+      <p><strong>手机:</strong> ${row.phone || '-'}</p>
+      <p><strong>邮箱:</strong> ${row.email || '-'}</p>
+      <p><strong>状态:</strong> ${row.status === 1 ? '启用' : '禁用'}</p>
+      <p><strong>创建时间:</strong> ${row.createdAt || '-'}</p>
+    </div>
+    `,
+    '用户详情',
+    {
+      dangerouslyUseHTMLString: true,
+      confirmButtonText: '关闭',
+    }
+  )
+}
+
+const handleDelete = (row: UserInfo) => {
+  ElMessage.success(`删除用户 ${row.username} 成功`)
+  tableRef.value?.refresh()
+}
+
+const handleBatchDelete = async (selection: UserInfo[]) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除选中的 ${selection.length} 个用户吗？`,
+      '批量删除',
+      { type: 'warning' }
+    )
+    ElMessage.success('批量删除成功')
+    tableRef.value?.clearSelection()
+    tableRef.value?.refresh()
+  } catch {
+    // 用户取消
   }
 }
 
-const handleSearch = () => {
-  query.pageNum = 1
-  loadData()
-}
-
-const handlePageChange = (page: number) => {
-  query.pageNum = page
-  loadData()
-}
-
-const handleSizeChange = (size: number) => {
-  query.pageSize = size
-  loadData()
-}
-
-onMounted(() => {
-  loadData()
+// 暴露给模板使用
+defineExpose({
+  searchRef,
+  tableRef,
 })
 </script>
 
-<template>
-  <el-card>
-    <template #header>用户管理</template>
-    <div class="toolbar">
-      <el-input
-        v-model="query.username"
-        placeholder="用户名"
-        clearable
-        class="toolbar__input"
-        @keyup.enter.native="handleSearch"
-      />
-      <el-button type="primary" @click="handleSearch">搜索</el-button>
-    </div>
-    <el-table v-loading="loading" :data="tableData" border stripe>
-      <el-table-column prop="username" label="用户名" width="160" />
-      <el-table-column prop="nickname" label="昵称" width="160" />
-      <el-table-column prop="roleName" label="角色" width="160" />
-      <el-table-column prop="orgName" label="组织" width="160" />
-      <el-table-column prop="phone" label="手机" width="160" />
-      <el-table-column prop="email" label="邮箱" />
-      <el-table-column prop="status" label="状态" width="100">
-        <template #default="{ row }">
-          <el-tag :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? '启用' : '禁用' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createdAt" label="创建时间" width="180" />
-      <el-table-column label="操作" width="160">
-        <template #default>
-          <el-button type="primary" text size="small" v-perm="['user:detail']">详情</el-button>
-          <el-button type="primary" text size="small" v-perm="['user:update']">编辑</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div class="pager">
-      <el-pagination
-        layout="total, sizes, prev, pager, next, jumper"
-        :current-page="query.pageNum"
-        :page-size="query.pageSize"
-        :total="query.total"
-        :page-sizes="[10, 20, 50]"
-        @current-change="handlePageChange"
-        @size-change="handleSizeChange"
-      />
-    </div>
-  </el-card>
-</template>
-
-<style scoped>
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.toolbar__input {
-  width: 200px;
-}
-.pager {
-  margin-top: 12px;
-  display: flex;
-  justify-content: flex-end;
+<style scoped lang="scss">
+.user-list {
+  padding: 12px;
 }
 </style>
-

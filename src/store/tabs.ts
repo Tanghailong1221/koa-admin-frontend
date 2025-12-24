@@ -16,7 +16,9 @@ export const useTabsStore = defineStore('tabs', {
     activePath: HOME_PATH,
   }),
   getters: {
-    keepAliveNames: state => state.visited.map(item => item.path),
+    keepAliveNames(): string[] {
+      return this.visited.map(item => item.path)
+    },
   },
   actions: {
     initHome(route?: RouteLocationNormalized) {
