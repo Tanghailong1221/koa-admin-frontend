@@ -354,7 +354,7 @@ const tableHeight = computed(() => {
       return `${calculatedHeight.value}px`
     }
     // 否则使用默认的 calc 值作为 fallback
-    return 'calc(100vh - 380px)'
+    return 'calc(100vh - 300px)'
   }
   return undefined
 })
@@ -363,16 +363,24 @@ const tableHeight = computed(() => {
 const calculateTableHeight = () => {
   if (!autoHeight.value || !containerRef.value) return
 
-  // 获取视口高度
-  const viewportHeight = window.innerHeight
-  // 获取容器距离视口顶部的距离
+  // 获取容器的实际可用高度
   const containerRect = containerRef.value.getBoundingClientRect()
-  const containerTop = containerRect.top
+  const containerHeight = containerRect.height
 
-  // 计算可用高度：视口高度 - 容器顶部距离 - 底部边距(24px) - 分页高度(60px) - 工具栏高度(50px) - card padding(40px)
-  // 简化计算：视口高度 - 容器顶部 - 固定偏移量
-  const offset = 180 // 分页 + 工具栏 + padding + 边距
-  const availableHeight = viewportHeight - containerTop - offset
+  // 计算内部元素占用的高度
+  // card header (如果有): 约 60px
+  // 工具栏: 约 50px
+  // 分页: 约 60px
+  // card padding: 约 40px
+  let internalOffset = 50 + 60 + 40 // 工具栏 + 分页 + padding
+
+  // 如果有 card header
+  if (showCardHeader.value) {
+    internalOffset += 60
+  }
+
+  // 计算表格可用高度
+  const availableHeight = containerHeight - internalOffset
 
   // 设置最小高度为 200px
   calculatedHeight.value = Math.max(200, availableHeight)

@@ -9,6 +9,14 @@
   --el-color-primary-light-8: #B2D0FF;
   --el-color-primary-light-9: #CFE0FF;
   --el-color-primary-dark-2: #0E42D2;
+
+  /* Element Plus 字体大小变量 */
+  --el-font-size-base: var(--app-font-size, 14px);
+  --el-font-size-extra-small: calc(var(--app-font-size, 14px) - 2px);
+  --el-font-size-small: calc(var(--app-font-size, 14px) - 1px);
+  --el-font-size-medium: calc(var(--app-font-size, 14px) + 2px);
+  --el-font-size-large: calc(var(--app-font-size, 14px) + 4px);
+  --el-font-size-extra-large: calc(var(--app-font-size, 14px) + 6px);
 }
 
 /* ========== 亮色模式 ========== */
@@ -385,4 +393,196 @@ html.dark .el-popover {
 html.dark .el-tooltip__popper {
   background: #1A1F3A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+
+/* ========== 全局字体大小控制 ========== */
+/* 确保所有 Element Plus 组件响应字体大小变化 */
+.el-button {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-button--small {
+  font-size: var(--el-font-size-small) !important;
+}
+
+.el-button--large {
+  font-size: var(--el-font-size-medium) !important;
+}
+
+.el-input__inner,
+.el-textarea__inner {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-select .el-input__inner {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-form-item__label {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-table {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-table th.el-table__cell {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-table td.el-table__cell {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-menu-item,
+.el-sub-menu__title {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-dropdown-menu__item {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-tag {
+  font-size: var(--el-font-size-small) !important;
+}
+
+.el-dialog__title {
+  font-size: var(--el-font-size-medium) !important;
+}
+
+.el-dialog__body {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-message-box__title {
+  font-size: var(--el-font-size-medium) !important;
+}
+
+.el-message-box__content {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-notification__title {
+  font-size: var(--el-font-size-medium) !important;
+}
+
+.el-notification__content {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-pagination {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-pagination button,
+.el-pager li {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-checkbox__label,
+.el-radio__label {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-breadcrumb__item {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-tabs__item {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-card__header {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-descriptions__label,
+.el-descriptions__content {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-alert__title {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-alert__description {
+  font-size: var(--el-font-size-small) !important;
+}
+
+.el-popover {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-tooltip__popper {
+  font-size: var(--el-font-size-small) !important;
+}
+
+.el-message {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-empty__description {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-upload__tip {
+  font-size: var(--el-font-size-small) !important;
+}
+
+.el-tree-node__label {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-cascader-node__label {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-date-picker {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-time-panel {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-statistic__head {
+  font-size: var(--el-font-size-small) !important;
+}
+
+.el-statistic__content {
+  font-size: var(--el-font-size-large) !important;
+}
+
+.el-result__title {
+  font-size: var(--el-font-size-medium) !important;
+}
+
+.el-result__subtitle {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-steps__title {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-steps__description {
+  font-size: var(--el-font-size-small) !important;
+}
+
+.el-timeline-item__content {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-timeline-item__timestamp {
+  font-size: var(--el-font-size-small) !important;
+}
+
+.el-collapse-item__header {
+  font-size: var(--el-font-size-base) !important;
+}
+
+.el-collapse-item__content {
+  font-size: var(--el-font-size-base) !important;
 }

@@ -48,12 +48,229 @@
               />
             </template>
 
-            <!-- 内置字段类型 -->
-            <template v-else>
-              <component
-                :is="getFieldComponent(field.type)"
+            <!-- Input 输入框 -->
+            <template v-else-if="field.type === FormFieldType.INPUT">
+              <el-input
                 v-model="formData[field.name]"
-                v-bind="getFieldProps(field)"
+                :placeholder="field.placeholder || `请输入${field.label}`"
+                :disabled="field.disabled"
+                :readonly="field.readonly"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- Textarea 文本域 -->
+            <template v-else-if="field.type === FormFieldType.TEXTAREA">
+              <el-input
+                v-model="formData[field.name]"
+                type="textarea"
+                :placeholder="field.placeholder || `请输入${field.label}`"
+                :disabled="field.disabled"
+                :readonly="field.readonly"
+                :rows="field.fieldProps?.rows || 4"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- Number 数字输入框 -->
+            <template v-else-if="field.type === FormFieldType.NUMBER">
+              <el-input-number
+                v-model="formData[field.name]"
+                :placeholder="field.placeholder"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- Select 下拉选择 -->
+            <template v-else-if="field.type === FormFieldType.SELECT">
+              <el-select
+                v-model="formData[field.name]"
+                :placeholder="field.placeholder || `请选择${field.label}`"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              >
+                <el-option
+                  v-for="opt in (field.fieldProps?.options || [])"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :value="opt.value"
+                  :disabled="opt.disabled"
+                />
+              </el-select>
+            </template>
+
+            <!-- Radio 单选框 -->
+            <template v-else-if="field.type === FormFieldType.RADIO">
+              <el-radio-group
+                v-model="formData[field.name]"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              >
+                <el-radio
+                  v-for="opt in (field.fieldProps?.options || [])"
+                  :key="opt.value"
+                  :value="opt.value"
+                  :disabled="opt.disabled"
+                >
+                  {{ opt.label }}
+                </el-radio>
+              </el-radio-group>
+            </template>
+
+            <!-- Checkbox 多选框 -->
+            <template v-else-if="field.type === FormFieldType.CHECKBOX">
+              <el-checkbox-group
+                v-model="formData[field.name]"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              >
+                <el-checkbox
+                  v-for="opt in (field.fieldProps?.options || [])"
+                  :key="opt.value"
+                  :value="opt.value"
+                  :disabled="opt.disabled"
+                >
+                  {{ opt.label }}
+                </el-checkbox>
+              </el-checkbox-group>
+            </template>
+
+            <!-- Switch 开关 -->
+            <template v-else-if="field.type === FormFieldType.SWITCH">
+              <el-switch
+                v-model="formData[field.name]"
+                :disabled="field.disabled"
+                :active-text="field.fieldProps?.activeText"
+                :inactive-text="field.fieldProps?.inactiveText"
+                :active-value="field.fieldProps?.activeValue"
+                :inactive-value="field.fieldProps?.inactiveValue"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- Date 日期选择 -->
+            <template v-else-if="field.type === FormFieldType.DATE">
+              <el-date-picker
+                v-model="formData[field.name]"
+                type="date"
+                :placeholder="field.placeholder || `请选择${field.label}`"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- DateRange 日期范围 -->
+            <template v-else-if="field.type === FormFieldType.DATERANGE">
+              <el-date-picker
+                v-model="formData[field.name]"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- DateTime 日期时间 -->
+            <template v-else-if="field.type === FormFieldType.DATETIME">
+              <el-date-picker
+                v-model="formData[field.name]"
+                type="datetime"
+                :placeholder="field.placeholder || `请选择${field.label}`"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- DateTimeRange 日期时间范围 -->
+            <template v-else-if="field.type === FormFieldType.DATETIMERANGE">
+              <el-date-picker
+                v-model="formData[field.name]"
+                type="datetimerange"
+                range-separator="至"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- Time 时间选择 -->
+            <template v-else-if="field.type === FormFieldType.TIME">
+              <el-time-picker
+                v-model="formData[field.name]"
+                :placeholder="field.placeholder || `请选择${field.label}`"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- TimeRange 时间范围 -->
+            <template v-else-if="field.type === FormFieldType.TIMERANGE">
+              <el-time-picker
+                v-model="formData[field.name]"
+                is-range
+                range-separator="至"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- Slider 滑块 -->
+            <template v-else-if="field.type === FormFieldType.SLIDER">
+              <el-slider
+                v-model="formData[field.name]"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- Rate 评分 -->
+            <template v-else-if="field.type === FormFieldType.RATE">
+              <el-rate
+                v-model="formData[field.name]"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- Color 颜色选择 -->
+            <template v-else-if="field.type === FormFieldType.COLOR">
+              <el-color-picker
+                v-model="formData[field.name]"
+                :disabled="field.disabled"
+                v-bind="field.fieldProps"
+                @change="handleFieldChange(field.name, $event)"
+              />
+            </template>
+
+            <!-- 默认 Input -->
+            <template v-else>
+              <el-input
+                v-model="formData[field.name]"
+                :placeholder="field.placeholder || `请输入${field.label}`"
+                :disabled="field.disabled"
+                :readonly="field.readonly"
+                v-bind="field.fieldProps"
                 @change="handleFieldChange(field.name, $event)"
               />
             </template>
@@ -68,8 +285,9 @@
     </el-row>
 
     <!-- 表单操作按钮 -->
-    <el-form-item v-if="!readonly" class="form-actions">
+    <el-form-item v-if="!readonly && (formConfig.showSubmit || formConfig.showReset || formConfig.showCancel)" class="form-actions">
       <el-button
+        v-if="formConfig.showSubmit"
         type="primary"
         :loading="loadingState"
         @click="handleSubmit"
@@ -103,7 +321,6 @@ import type {
   ProFormInstance,
   ProFormField,
   ProFormConfig,
-  FormFieldTypeValue
 } from './types'
 import { FormFieldType } from './types'
 
@@ -123,7 +340,6 @@ const emit = defineEmits<ProFormEmits<T>>()
 const formRef = ref<InstanceType<typeof ElForm>>()
 const formData = ref({ ...props.modelValue }) as any
 const loadingState = ref(false)
-const fieldPropsMap = ref<Map<string, Partial<ProFormField<T>>>>(new Map())
 
 // 表单配置
 const formConfig = computed<Required<ProFormConfig>>(() => ({
@@ -137,6 +353,7 @@ const formConfig = computed<Required<ProFormConfig>>(() => ({
   statusIcon: false,
   disabled: false,
   gutter: 20,
+  showSubmit: true,
   showReset: true,
   showCancel: false,
   submitText: '提交',
@@ -166,37 +383,26 @@ const mergedRules = computed(() => {
   return rules
 })
 
-// 可见字段（根据依赖条件过滤）
+// 可见字段
 const visibleFields = computed(() => {
   return props.fields.filter(field => {
-    // 隐藏字段
     if (field.hidden) return false
     
-    // 检查依赖条件
     if (field.dependencies && field.dependencies.length > 0) {
       return field.dependencies.every(dep => {
         const depValue = formData.value[dep.field]
         const operator = dep.operator || 'eq'
         
         switch (operator) {
-          case 'eq':
-            return depValue === dep.value
-          case 'ne':
-            return depValue !== dep.value
-          case 'gt':
-            return depValue > dep.value
-          case 'gte':
-            return depValue >= dep.value
-          case 'lt':
-            return depValue < dep.value
-          case 'lte':
-            return depValue <= dep.value
-          case 'in':
-            return Array.isArray(dep.value) && dep.value.includes(depValue)
-          case 'notIn':
-            return Array.isArray(dep.value) && !dep.value.includes(depValue)
-          default:
-            return true
+          case 'eq': return depValue === dep.value
+          case 'ne': return depValue !== dep.value
+          case 'gt': return depValue > dep.value
+          case 'gte': return depValue >= dep.value
+          case 'lt': return depValue < dep.value
+          case 'lte': return depValue <= dep.value
+          case 'in': return Array.isArray(dep.value) && dep.value.includes(depValue)
+          case 'notIn': return Array.isArray(dep.value) && !dep.value.includes(depValue)
+          default: return true
         }
       })
     }
@@ -205,84 +411,10 @@ const visibleFields = computed(() => {
   })
 })
 
-// 获取字段组件
-const getFieldComponent = (type: FormFieldTypeValue) => {
-  const componentMap: Record<FormFieldTypeValue, string> = {
-    [FormFieldType.INPUT]: 'el-input',
-    [FormFieldType.TEXTAREA]: 'el-input',
-    [FormFieldType.NUMBER]: 'el-input-number',
-    [FormFieldType.SELECT]: 'el-select',
-    [FormFieldType.RADIO]: 'el-radio-group',
-    [FormFieldType.CHECKBOX]: 'el-checkbox-group',
-    [FormFieldType.DATE]: 'el-date-picker',
-    [FormFieldType.DATERANGE]: 'el-date-picker',
-    [FormFieldType.TIME]: 'el-time-picker',
-    [FormFieldType.TIMERANGE]: 'el-time-picker',
-    [FormFieldType.DATETIME]: 'el-date-picker',
-    [FormFieldType.DATETIMERANGE]: 'el-date-picker',
-    [FormFieldType.SWITCH]: 'el-switch',
-    [FormFieldType.SLIDER]: 'el-slider',
-    [FormFieldType.RATE]: 'el-rate',
-    [FormFieldType.COLOR]: 'el-color-picker',
-    [FormFieldType.UPLOAD]: 'el-upload',
-    [FormFieldType.CUSTOM]: 'div'
-  }
-  
-  return componentMap[type] || 'el-input'
-}
-
-// 获取字段属性
-const getFieldProps = (field: ProFormField<T>) => {
-  const baseProps: Record<string, any> = {
-    placeholder: field.placeholder || `请输入${field.label}`,
-    disabled: field.disabled,
-    readonly: field.readonly,
-    ...field.fieldProps
-  }
-  
-  // 合并动态设置的属性
-  const dynamicProps = fieldPropsMap.value.get(field.name)
-  if (dynamicProps) {
-    Object.assign(baseProps, dynamicProps)
-  }
-  
-  // 根据类型添加特定属性
-  switch (field.type) {
-    case FormFieldType.TEXTAREA:
-      baseProps.type = 'textarea'
-      baseProps.rows = baseProps.rows || 4
-      break
-    case FormFieldType.DATERANGE:
-      baseProps.type = 'daterange'
-      baseProps.rangeSeparator = '至'
-      baseProps.startPlaceholder = '开始日期'
-      baseProps.endPlaceholder = '结束日期'
-      break
-    case FormFieldType.TIMERANGE:
-      baseProps.isRange = true
-      baseProps.rangeSeparator = '至'
-      baseProps.startPlaceholder = '开始时间'
-      baseProps.endPlaceholder = '结束时间'
-      break
-    case FormFieldType.DATETIME:
-      baseProps.type = 'datetime'
-      break
-    case FormFieldType.DATETIMERANGE:
-      baseProps.type = 'datetimerange'
-      baseProps.rangeSeparator = '至'
-      baseProps.startPlaceholder = '开始时间'
-      baseProps.endPlaceholder = '结束时间'
-      break
-  }
-  
-  return baseProps
-}
-
 // 事件处理
 const handleFieldChange = (field: string, value: any) => {
   emit('field-change', field, value)
   
-  // 触发字段的 onChange 回调
   const fieldConfig = props.fields.find(f => f.name === field)
   if (fieldConfig?.onChange) {
     fieldConfig.onChange(value, formData.value)
@@ -329,7 +461,7 @@ const validateField = async (field: string | string[]): Promise<boolean> => {
   try {
     await formRef.value.validateField(field)
     return true
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -337,7 +469,6 @@ const validateField = async (field: string | string[]): Promise<boolean> => {
 const resetFields = () => {
   formRef.value?.resetFields()
   
-  // 重置为默认值
   props.fields.forEach(field => {
     if (field.defaultValue !== undefined) {
       formData.value[field.name] = field.defaultValue
@@ -365,8 +496,9 @@ const getFieldValue = (field: string) => {
   return formData.value[field]
 }
 
-const setFieldProps = (field: string, props: Partial<ProFormField<T>>) => {
-  fieldPropsMap.value.set(field, props)
+const setFieldProps = (field: string, fieldProps: Partial<ProFormField<T>>) => {
+  // 动态设置字段属性的逻辑可以在这里实现
+  console.log('setFieldProps', field, fieldProps)
 }
 
 const setLoading = (loading: boolean) => {
@@ -404,7 +536,6 @@ watch(() => props.loading, (val) => {
 
 // 初始化
 onMounted(() => {
-  // 设置默认值
   props.fields.forEach(field => {
     if (field.defaultValue !== undefined && formData.value[field.name] === undefined) {
       formData.value[field.name] = field.defaultValue
@@ -447,6 +578,13 @@ onMounted(() => {
     .el-button {
       margin-right: 12px;
     }
+  }
+
+  // 让 Select 和 DatePicker 宽度 100%
+  :deep(.el-select),
+  :deep(.el-date-editor),
+  :deep(.el-input-number) {
+    width: 100%;
   }
 }
 </style>

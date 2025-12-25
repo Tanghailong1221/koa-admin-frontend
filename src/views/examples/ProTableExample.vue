@@ -2,7 +2,7 @@
   <div class="pro-table-example">
     <!-- 功能说明 -->
     <el-alert
-      title="ProSearch + ProTablePlus 功能演示"
+      title="ProSearch + ProTablePlus + ProDialog 功能演示"
       type="info"
       :closable="false"
       show-icon
@@ -19,6 +19,7 @@
           <span><el-tag size="small">打印功能</el-tag></span>
           <span><el-tag size="small">列设置</el-tag></span>
           <span><el-tag size="small">数据导出</el-tag></span>
+          <span><el-tag size="small" type="success">弹窗表单</el-tag></span>
         </div>
       </template>
     </el-alert>
@@ -94,6 +95,16 @@
       </template>
     </ProTablePlus>
 
+    <!-- 用户表单弹窗 -->
+    <ProDialog
+      ref="userDialogRef"
+      :title="{ add: '新增用户', edit: '编辑用户', view: '查看用户详情' }"
+      :fields="userFormFields"
+      :dialog-config="dialogConfig"
+      @confirm="handleDialogConfirm"
+      @cancel="handleDialogCancel"
+    />
+
     <!-- 帮助对话框 -->
     <el-dialog v-model="helpDialogVisible" title="功能说明" width="600px">
       <el-descriptions :column="1" border>
@@ -121,6 +132,9 @@
         <el-descriptions-item label="列设置">
           点击工具栏的设置按钮可调整列的显示/隐藏和顺序
         </el-descriptions-item>
+        <el-descriptions-item label="弹窗表单">
+          点击新增/编辑/查看按钮，使用 ProDialog 组件展示表单弹窗
+        </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -133,10 +147,13 @@ import { Plus, Delete, Star, Refresh, QuestionFilled, Location } from '@element-
 import {
   ProTablePlus,
   ProSearch,
+  ProDialog,
   defineProTableOptions,
   defineSearchOptions,
+  FormFieldType,
+  DialogMode,
 } from '@/components/pro'
-import type { ProTablePlusInstance, ProSearchInstance } from '@/components/pro'
+import type { ProTablePlusInstance, ProSearchInstance, ProDialogInstance, ProDialogConfig, ProFormField } from '@/components/pro'
 
 /**
  * 用户接口
@@ -157,10 +174,127 @@ interface User {
 // Refs
 const tableRef = ref<ProTablePlusInstance<User>>()
 const searchRef = ref<ProSearchInstance>()
+const userDialogRef = ref<ProDialogInstance<User>>()
 const helpDialogVisible = ref(false)
 
 // 搜索参数
 const searchParams = ref<Record<string, any>>({})
+
+/**
+ * 用户表单字段配置
+ */
+const userFormFields: ProFormField[] = [
+  {
+    name: 'username',
+    label: '用户名',
+    type: FormFieldType.INPUT,
+    required: true,
+    placeholder: '请输入用户名',
+    span: 12,
+    rules: [
+      { required: true, message: '请输入用户名', trigger: 'blur' },
+      { min: 3, max: 20, message: '用户名长度为3-20个字符', trigger: 'blur' },
+    ],
+  },
+  {
+    name: 'nickname',
+    label: '昵称',
+    type: FormFieldType.INPUT,
+    required: true,
+    placeholder: '请输入昵称',
+    span: 12,
+  },
+  {
+    name: 'email',
+    label: '邮箱',
+    type: FormFieldType.INPUT,
+    required: true,
+    placeholder: '请输入邮箱',
+    span: 12,
+    rules: [
+      { required: true, message: '请输入邮箱', trigger: 'blur' },
+      { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' },
+    ],
+  },
+  {
+    name: 'phone',
+    label: '手机号',
+    type: FormFieldType.INPUT,
+    placeholder: '请输入手机号',
+    span: 12,
+    rules: [
+      { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' },
+    ],
+  },
+  {
+    name: 'province',
+    label: '省份',
+    type: FormFieldType.SELECT,
+    placeholder: '请选择省份',
+    span: 12,
+    fieldProps: {
+      options: [
+        { label: '广东省', value: '广东省' },
+        { label: '浙江省', value: '浙江省' },
+        { label: '江苏省', value: '江苏省' },
+      ],
+    },
+  },
+  {
+    name: 'city',
+    label: '城市',
+    type: FormFieldType.SELECT,
+    placeholder: '请选择城市',
+    span: 12,
+    fieldProps: {
+      options: [
+        { label: '广州市', value: '广州市' },
+        { label: '深圳市', value: '深圳市' },
+        { label: '杭州市', value: '杭州市' },
+        { label: '宁波市', value: '宁波市' },
+        { label: '南京市', value: '南京市' },
+        { label: '苏州市', value: '苏州市' },
+      ],
+    },
+  },
+  {
+    name: 'role',
+    label: '角色',
+    type: FormFieldType.SELECT,
+    required: true,
+    placeholder: '请选择角色',
+    span: 12,
+    fieldProps: {
+      options: [
+        { label: '管理员', value: 'admin' },
+        { label: '普通用户', value: 'user' },
+        { label: '访客', value: 'guest' },
+      ],
+    },
+  },
+  {
+    name: 'status',
+    label: '状态',
+    type: FormFieldType.SWITCH,
+    defaultValue: 1,
+    span: 12,
+    fieldProps: {
+      activeText: '启用',
+      inactiveText: '禁用',
+      activeValue: 1,
+      inactiveValue: 0,
+    },
+  },
+]
+
+/**
+ * 弹窗配置
+ */
+const dialogConfig: ProDialogConfig = {
+  size: 'large',
+  draggable: true,
+  showReset: true,
+}
 
 /**
  * 模拟数据
@@ -627,35 +761,40 @@ const handleRefresh = () => {
 }
 
 const handleAdd = () => {
-  ElMessage.info('新增用户功能开发中...')
+  userDialogRef.value?.open(DialogMode.ADD)
 }
 
 const handleEdit = (row: User) => {
-  ElMessage.info(`编辑用户: ${row.username}`)
+  userDialogRef.value?.open(DialogMode.EDIT, row)
 }
 
 const handleView = (row: User) => {
-  ElMessageBox.alert(
-    `
-    <div style="line-height: 2;">
-      <p><strong>ID:</strong> ${row.id}</p>
-      <p><strong>用户名:</strong> ${row.username}</p>
-      <p><strong>昵称:</strong> ${row.nickname}</p>
-      <p><strong>邮箱:</strong> ${row.email}</p>
-      <p><strong>手机:</strong> ${row.phone}</p>
-      <p><strong>省份:</strong> ${row.province}</p>
-      <p><strong>城市:</strong> ${row.city}</p>
-      <p><strong>角色:</strong> ${row.role}</p>
-      <p><strong>状态:</strong> ${row.status === 1 ? '启用' : '禁用'}</p>
-      <p><strong>创建时间:</strong> ${row.createdAt}</p>
-    </div>
-    `,
-    '用户详情',
-    {
-      dangerouslyUseHTMLString: true,
-      confirmButtonText: '关闭',
-    }
-  )
+  userDialogRef.value?.open(DialogMode.VIEW, row)
+}
+
+/**
+ * 弹窗确认事件
+ */
+const handleDialogConfirm = async (data: User) => {
+  console.log('提交数据:', data)
+  
+  // 模拟提交
+  userDialogRef.value?.setConfirmLoading(true)
+  
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  
+  userDialogRef.value?.setConfirmLoading(false)
+  userDialogRef.value?.close()
+  
+  ElMessage.success('操作成功')
+  tableRef.value?.refresh()
+}
+
+/**
+ * 弹窗取消事件
+ */
+const handleDialogCancel = () => {
+  console.log('取消操作')
 }
 
 const handleDelete = (row: User) => {

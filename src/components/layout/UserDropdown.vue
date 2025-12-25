@@ -5,12 +5,10 @@ import { ElMessageBox } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import { useMenuStore } from '@/store/menu'
 import { useTabsStore } from '@/store/tabs'
-import { useThemeStore } from '@/store/theme'
 
 const auth = useAuthStore()
 const menuStore = useMenuStore()
 const tabsStore = useTabsStore()
-const themeStore = useThemeStore()
 const router = useRouter()
 
 const displayName = computed(() => auth.userInfo?.nickname || auth.userInfo?.username || '用户')
@@ -31,20 +29,12 @@ const handleCommand = async (cmd: string) => {
     menuStore.reset()
     tabsStore.reset()
     router.replace({ name: 'Login' })
-  } else if (cmd === 'toggle-theme') {
-    themeStore.toggle()
   }
 }
 </script>
 
 <template>
   <div class="header-actions">
-    <el-button
-      :icon="themeStore.mode === 'dark' ? 'Sunny' : 'Moon'"
-      circle
-      class="theme-toggle"
-      @click="themeStore.toggle()"
-    />
     <el-dropdown trigger="click" @command="handleCommand">
       <span class="user">
         <el-avatar v-if="avatar" :src="avatar" size="small" />
@@ -53,10 +43,7 @@ const handleCommand = async (cmd: string) => {
       </span>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item command="toggle-theme">
-            {{ themeStore.mode === 'dark' ? '切换到亮色模式' : '切换到暗色模式' }}
-          </el-dropdown-item>
-          <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+          <el-dropdown-item command="logout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -68,22 +55,6 @@ const handleCommand = async (cmd: string) => {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.theme-toggle {
-  background: var(--bg-glass);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  background: var(--bg-glass-hover);
-  border-color: var(--border-color-hover);
-  box-shadow: var(--shadow-glow-cyan);
-  transform: rotate(180deg);
 }
 
 .user {

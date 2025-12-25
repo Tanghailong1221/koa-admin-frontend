@@ -246,5 +246,37 @@ defineExpose({
 <style scoped lang="scss">
 .role-list {
   padding: 12px;
+  height: calc(100vh - 120px); // 头部64 + tabs约40 + main padding 12 + 额外4
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  // ProSearch 组件不需要 flex-grow
+  :deep(.pro-search) {
+    flex-shrink: 0;
+  }
+
+  // ProTablePlus 容器填充剩余空间
+  :deep(.pro-table-plus-container) {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+
+    .pro-table-plus,
+    .el-card {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .el-card__body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+  }
 }
 </style>

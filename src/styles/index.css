@@ -9,6 +9,14 @@
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* 字体大小变量 */
+  --app-font-size: 14px;
+  --app-font-size-xs: calc(var(--app-font-size) - 2px);
+  --app-font-size-sm: calc(var(--app-font-size) - 1px);
+  --app-font-size-md: var(--app-font-size);
+  --app-font-size-lg: calc(var(--app-font-size) + 2px);
+  --app-font-size-xl: calc(var(--app-font-size) + 4px);
 }
 
 * {
@@ -23,17 +31,57 @@ body {
   padding: 0;
   height: 100%;
   overflow: hidden;
+  font-size: var(--app-font-size);
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, font-size 0.2s ease;
 }
 
 #app {
   height: 100%;
   overflow: hidden;
+  font-size: var(--app-font-size);
+}
+
+/* 全局字体大小应用 */
+.el-button,
+.el-input__inner,
+.el-select__input,
+.el-textarea__inner,
+.el-form-item__label,
+.el-table,
+.el-menu-item,
+.el-sub-menu__title,
+.el-dropdown-menu__item,
+.el-tag,
+.el-breadcrumb,
+.el-tabs__item,
+.el-dialog__title,
+.el-message-box__title,
+.el-notification__title,
+.el-card__header,
+.el-descriptions__label,
+.el-descriptions__content,
+.el-pagination,
+.el-checkbox__label,
+.el-radio__label {
+  font-size: inherit !important;
+}
+
+/* Element Plus 组件字体大小覆盖 */
+.el-table {
+  --el-table-font-size: var(--app-font-size);
+}
+
+.el-menu {
+  --el-menu-item-font-size: var(--app-font-size);
+}
+
+.el-button {
+  --el-button-font-size: var(--app-font-size);
 }
 
 a {

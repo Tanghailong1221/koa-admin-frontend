@@ -121,6 +121,8 @@ export interface ProFormConfig {
     disabled?: boolean
     /** 栅格间隔 */
     gutter?: number
+    /** 是否显示提交按钮 */
+    showSubmit?: boolean
     /** 是否显示重置按钮 */
     showReset?: boolean
     /** 是否显示取消按钮 */
