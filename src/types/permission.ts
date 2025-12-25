@@ -11,6 +11,12 @@ export interface PermissionInfo {
     permCode: string
     permType: PermissionType
     parentId: number
+    path?: string
+    component?: string
+    icon?: string
+    sort?: number
+    visible?: number
+    remark?: string
     children?: PermissionInfo[]
     createdAt?: string
     updatedAt?: string
@@ -36,6 +42,12 @@ export interface CreatePermissionParams {
     permCode: string
     permType: PermissionType
     parentId?: number
+    path?: string
+    component?: string
+    icon?: string
+    sort?: number
+    visible?: number
+    remark?: string
 }
 
 // 更新权限参数
@@ -44,4 +56,10 @@ export interface UpdatePermissionParams {
     permCode?: string
     permType?: PermissionType
     parentId?: number
+    path?: string
+    component?: string
+    icon?: string
+    sort?: number
+    visible?: number
+    remark?: string
 }

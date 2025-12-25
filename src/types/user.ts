@@ -17,11 +17,16 @@ export interface UserInfo {
     status: Status
     roleId?: number
     roleName?: string
+    roles?: Array<{ id: number; code: string; name: string }>
     orgId?: number
     orgName?: string
+    deptId?: number // 部门ID（用于数据权限）
     positionId?: number
     positionName?: string
     permissions?: string[]
+    remark?: string
+    lastLoginIp?: string
+    lastLoginTime?: string
     createdAt?: string
     updatedAt?: string
 }
@@ -60,6 +65,7 @@ export interface UserListParams {
 export interface CreateUserParams {
     username: string
     password: string
+    nickname?: string
     roleId: number
     status?: Status
     orgId?: number
@@ -69,11 +75,13 @@ export interface CreateUserParams {
     email?: string
     gender?: Gender
     birthday?: string
+    remark?: string
 }
 
 // 更新用户参数
 export interface UpdateUserParams {
     username?: string
+    nickname?: string
     roleId?: number
     status?: Status
     orgId?: number
@@ -83,6 +91,7 @@ export interface UpdateUserParams {
     email?: string
     gender?: Gender
     birthday?: string
+    remark?: string
 }
 
 // 修改密码参数

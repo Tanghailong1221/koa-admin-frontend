@@ -14,8 +14,8 @@ const loading = ref(false)
 const showPassword = ref(false)
 const rememberPassword = ref(false)
 const form = reactive({
-  username: '',
-  password: '',
+  username: 'admin',
+  password: '123456',
 })
 
 const rules = {

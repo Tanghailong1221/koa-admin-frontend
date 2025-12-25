@@ -7,9 +7,10 @@ export interface RoleInfo {
     id: number
     roleName: string
     roleCode: string
-    remark?: string
     description?: string
+    remark?: string
     status?: number
+    sort?: number
     permissionIds?: number[]
     createdAt?: string
     updatedAt?: string
@@ -27,6 +28,8 @@ export interface CreateRoleParams {
     roleName: string
     roleCode: string
     description?: string
+    status?: number
+    sort?: number
     permissionIds?: number[]
 }
 
@@ -35,6 +38,8 @@ export interface UpdateRoleParams {
     roleName?: string
     roleCode?: string
     description?: string
+    status?: number
+    sort?: number
     permissionIds?: number[]
 }
 

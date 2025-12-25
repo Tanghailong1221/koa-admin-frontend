@@ -12,6 +12,7 @@ export interface PositionInfo {
     orgId: number
     sort: number
     status: Status
+    remark?: string
     createdAt?: string
     updatedAt?: string
 }
@@ -32,6 +33,7 @@ export interface CreatePositionParams {
     orgId: number
     sort?: number
     status?: Status
+    remark?: string
 }
 
 // 更新职位参数
@@ -41,4 +43,5 @@ export interface UpdatePositionParams {
     orgId?: number
     sort?: number
     status?: Status
+    remark?: string
 }

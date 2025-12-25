@@ -12,6 +12,10 @@ export interface OrgInfo {
     parentId: number
     sort: number
     status: Status
+    leader?: string
+    phone?: string
+    email?: string
+    remark?: string
     children?: OrgInfo[]
     createdAt?: string
     updatedAt?: string
@@ -37,6 +41,10 @@ export interface CreateOrgParams {
     parentId?: number
     sort?: number
     status?: Status
+    leader?: string
+    phone?: string
+    email?: string
+    remark?: string
 }
 
 // 更新机构参数
@@ -46,4 +54,8 @@ export interface UpdateOrgParams {
     parentId?: number
     sort?: number
     status?: Status
+    leader?: string
+    phone?: string
+    email?: string
+    remark?: string
 }
